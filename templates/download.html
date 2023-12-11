@@ -5,24 +5,81 @@
     <title>Download</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #787272;
+            padding: 0 20px;
+        }
+        code{
+            font-size: 0.9rem;
+        }
+        #header {
+            background-color: rgb(2, 2, 50);
+            color: lightgray;
+            padding: 10px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            top: 30px;
+            border-top-right-radius: 10px;
+            border-top-left-radius: 10px;
+        }
+        #copy-container {
+            display: flex;
+            align-items: center;
+        }
+        #copied, #copy-button{
+            margin-right: 20px;
+        }
+        .button {
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
     {% if err != "0" %}
-        <h3>{{html}}</h3>
+        <h1>{{html}}</h1>
     {% else %}
         <h1>Your HTML Code is here:</h1>
-        <pre><code class="language-html">{{html}}</code></pre>
+        <div id="header">
+        <div>{{name}}.html</div>
+            <div id="copy-container">
+                <div id="copied"></div>
+                <abbr title="Copy Code"><img src="/static/images/copy.png" alt="copy-button" id="copy-button" class="button" onclick="copyCode()"></abbr>
+                <abbr title="Download File"><img src="/static/images/download.png" alt="download-button" id="download-button" class="button" onclick="download()"></abbr>
+            </div>
+        </div>
+        <pre><code class="language-html" id="htmlcode">
+{{html}}
+</code></pre>
         <br>
         <form action="/download" method="post">
             <input type="hidden" name="html" value="{{html}}">
             <input type="hidden" name="name" value="{{name}}">
-            <button type="submit">Download</button>
+            <button type="submit" id = "submitBtn" style="display:none;">Download</button>
         </form>
     {% endif %}
 
 
-<script>hljs.highlightAll();</script>
+<script>
+hljs.highlightAll();
+function copyCode() {
+            var text = document.getElementById('htmlcode');
+            navigator.clipboard.writeText(text.innerText);
+            document.getElementById('copied').innerText = "Copied!";
+            clr = setTimeout(removeText, 1000);
+}
 
+function removeText(){
+    document.getElementById('copied').innerText = "";
+}
+
+function download(){
+    document.getElementById('submitBtn').click();
+}
+</script>
 
 </body>
 </html>

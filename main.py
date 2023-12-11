@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, redirect, url_for, send_file
 import pandas as pd
 from xlsx2html import xlsx2html
 from html2excel import ExcelParser
-# from html5print import HTMLBeautifier
+import bs4
 import os
 
 app = Flask(__name__)
@@ -40,13 +40,17 @@ def x2h(ename, name):
         out_stream = xlsx2html(ename)
         out_stream.seek(0)
         html = out_stream.read()
-        # html = HTMLBeautifier.beautify(html, 4)
+        soup = bs4.BeautifulSoup(html, 'html.parser')
+        formatter = bs4.formatter.HTMLFormatter(indent=4)
+        html = soup.prettify(formatter=formatter)
         return render_template('download.html', html = html, err = "0", name = name)
     except:
         try:
             df = pd.read_excel(ename)
             html = df.to_html(index=False)
-            # html = HTMLBeautifier.beautify(html, 4)
+            soup = bs4.BeautifulSoup(html, 'html.parser')
+            formatter = bs4.formatter.HTMLFormatter(indent=4)
+            html = soup.prettify(formatter=formatter)
             return render_template('download.html', html = html, err = "0", name = name)
         except:
             return render_template('download.html', html = "Due to some error, HTML cannot be generated!", err = "1", name = "0")
@@ -59,7 +63,9 @@ def c2h(fname, name):
     try:
         df = pd.read_csv(fname)
         html = df.to_html(index=False, header=False)
-        # html = HTMLBeautifier.beautify(html, 4)
+        soup = bs4.BeautifulSoup(html, 'html.parser')
+        formatter = bs4.formatter.HTMLFormatter(indent=4)
+        html = soup.prettify(formatter=formatter)
         return render_template('download.html', html = html, err = "0", name = name)
     except:
         return render_template('download.html', html = "Due to some error, HTML cannot be generated!", err = "1", name="0")

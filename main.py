@@ -6,7 +6,7 @@ import os
 # from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
-upload_path = 'mysite/'
+upload_path = 'convertr/'
 
 @app.route("/")
 def home():

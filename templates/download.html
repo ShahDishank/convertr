@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Download</title>
+</head>
+<body>
+    {% if err != "0" %}
+        <h3>{{html}}</h3>
+    {% else %}
+        <h1>Your HTML Code is here:</h1>
+        <pre><code>{{html}}</code></pre>
+        <br>
+        <form action="/download" method="post">
+            <input type="hidden" name="html" value="{{html}}">
+            <input type="hidden" name="name" value="{{name}}">
+            <button type="submit">Download</button>
+        </form>
+    {% endif %}
+</body>
+</html>

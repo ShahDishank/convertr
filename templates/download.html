@@ -3,13 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <title>Download</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 </head>
 <body>
     {% if err != "0" %}
         <h3>{{html}}</h3>
     {% else %}
         <h1>Your HTML Code is here:</h1>
-        <pre><code>{{html}}</code></pre>
+        <pre><code class="language-html">{{html}}</code></pre>
         <br>
         <form action="/download" method="post">
             <input type="hidden" name="html" value="{{html}}">
@@ -17,5 +19,10 @@
             <button type="submit">Download</button>
         </form>
     {% endif %}
+
+
+<script>hljs.highlightAll();</script>
+
+
 </body>
 </html>

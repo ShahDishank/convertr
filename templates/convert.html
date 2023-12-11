@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>
+        {% if variable == "x2h" %}
+            XLSX to HTML Conversion
+        {% elif variable == "c2h" %}
+            CSV to HTML Conversion
+        {% elif variable == "h2x" %}
+            HTML to XLSX Conversion
+        {% elif variable == "h2c" %}
+            HTML to CSV Conversion
+        {% endif %}
+    </title>
+</head>
+<body>
+    <form action = "/success/{{variable}}" method = "post" enctype="multipart/form-data">
+        <input type="file" name="file" required />
+        <input type = "submit" value="Upload">
+        <br><br>
+    </form>
+    <br>
+    {% if err != "0" %}
+        <p>{{err}}</p>
+    {% endif %}
+</body>
+</html>

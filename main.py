@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, redirect, url_for, send_file
 import pandas as pd
 from xlsx2html import xlsx2html
 from html2excel import ExcelParser
+# from html5print import HTMLBeautifier
 import os
 
 app = Flask(__name__)
@@ -14,7 +15,7 @@ def home():
 
 @app.route("/convert/<var>/<err>")
 def convert(var, err):
-    return render_template(f"{var}.html", variable = var, err = err)
+    return render_template("convert.html", variable = var, err = err)
 
 
 @app.route("/download", methods=['POST'])
@@ -38,11 +39,14 @@ def x2h(ename, name):
     try:
         out_stream = xlsx2html(ename)
         out_stream.seek(0)
-        return render_template('download.html', html = out_stream.read(), err = "0", name = name)
+        html = out_stream.read()
+        # html = HTMLBeautifier.beautify(html, 4)
+        return render_template('download.html', html = html, err = "0", name = name)
     except:
         try:
             df = pd.read_excel(ename)
             html = df.to_html(index=False)
+            # html = HTMLBeautifier.beautify(html, 4)
             return render_template('download.html', html = html, err = "0", name = name)
         except:
             return render_template('download.html', html = "Due to some error, HTML cannot be generated!", err = "1", name = "0")
@@ -55,6 +59,7 @@ def c2h(fname, name):
     try:
         df = pd.read_csv(fname)
         html = df.to_html(index=False, header=False)
+        # html = HTMLBeautifier.beautify(html, 4)
         return render_template('download.html', html = html, err = "0", name = name)
     except:
         return render_template('download.html', html = "Due to some error, HTML cannot be generated!", err = "1", name="0")

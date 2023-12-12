@@ -7,9 +7,18 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
     <style>
         body {
+            background: url('/static/images/background.jpg');
+            background-repeat: no-repeat;
+            background-size: cover;
             font-family: Arial, sans-serif;
-            background-color: #787272;
-            padding: 0 20px;
+            padding: 20px 20px;
+            min-height: 100vh;
+        }
+        .title-error-text{
+            font-size: 4rem;
+            color: white;
+            text-shadow: 5px 5px 5px black;
+            text-align: center;
         }
         code{
             font-size: 0.9rem;
@@ -40,9 +49,9 @@
 </head>
 <body>
     {% if err != "0" %}
-        <h1>{{html}}</h1>
+        <h1 class="title-error-text" id="error-text">{{html}}</h1>
     {% else %}
-        <h1>Your HTML Code is here:</h1>
+        <h1 class="title-error-text">Your HTML Code is here</h1>
         <div id="header">
         <div>{{name}}.html</div>
             <div id="copy-container">

@@ -29,9 +29,19 @@
             background-repeat: no-repeat;
             background-size: cover;
             min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-family: Arial, sans-serif;
+        }
+        ::-webkit-scrollbar, ::-webkit-scrollbar-thumb, ::-webkit-scrollbar-track{
+            display: none;
         }
         .container {
             padding-top: 50px;
+            padding-bottom: 50px;
+            min-height: 100vh;
         }
         #heading {
             font-size: 4rem;
@@ -40,6 +50,11 @@
         }
         form {
             width: 100%;
+        }
+        #file{
+            opacity: 0;
+            position: relative;
+            z-index: -1;
         }
         #file-label {
             padding-top: 20px;
@@ -87,6 +102,18 @@
         #cdBtn{
             width: 500px;
         }
+        footer{
+            background: transparent;
+            color: white;
+            text-shadow: 5px 5px 5px black;
+            font-size: 1.2rem;
+            margin: 30px 0;
+        }
+        footer a{
+            text-shadow: 1px 1px 3px rgb(0, 0, 0, 0.2);
+            text-decoration: none;
+            color: lightseagreen;
+        }
     </style>
 </head>
 <body>
@@ -105,12 +132,11 @@
         <div class="row">
             <div class="col-xs-12">
                 <form action = "/success/{{variable}}" method = "post" enctype="multipart/form-data" class="text-center">
-                    <label for="file" id="file-label" ondragover="handleDragOver(event)" ondrop="handleFileSelect(event)" ondragleave="handleDragLeave(event)">
+                    <label for="file" id="file-label">
                         <div class="wrapper">
                             <img src="/static/images/cloud.png" alt="cloud-img" id="cloud-img">
-                            <p id="file-text">Browse or Drag your file to Upload</p>
-                            <p id="drag-text" style="color: white; text-shadow: 5px 5px 5px black; font-size: 6rem; display: none;">Drag Here</p>
-                            <input type="file" name="file" id="file" required hidden />
+                            <p id="file-text">Drop your file or click here to browse</p>
+                            <input type="file" name="file" id="file"/>
                         </div>
                     </label>
                     {% if variable == "x2h" or variable == "c2h" %}
@@ -122,53 +148,60 @@
             </div>
         </div>
     </div>
+    <footer>Developed by &copy; <a href="mailto:shahdishank24@gmail.com" target="_blank">Dishank Shah</a></footer>
 
     <script>
         {% if err != "0" %}
             alert("{{err}}");
         {% endif %}
-        function handleDragOver(event) {
-            event.preventDefault();
-            document.getElementById("cloud-img").style.display = "none";
-            document.getElementById('file-text').style.display = "none";
-            document.getElementById('drag-text').style.display = "block";
-        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+        const fileInput = document.getElementById('file');
+        const fileLabel = document.getElementById('file-label');
+        const cloudImg = document.getElementById('cloud-img');
+        const fileText = document.getElementById('file-text');
+
+        fileInput.addEventListener('change', handleFileSelect);
+        fileLabel.addEventListener('dragover', handleDragOver);
+        fileLabel.addEventListener('dragleave', handleDragLeave);
+        fileLabel.addEventListener('drop', handleDrop);
 
         function handleFileSelect(event) {
-            event.preventDefault();
+            const files = event.target.files;
+            updateFileDetails(files);
+        }
 
+        function handleDragOver(event) {
+            event.preventDefault();
+            fileText.innerText = "Drop Here";
+        }
+
+        function handleDragLeave(event) {
+            event.preventDefault();
+            fileText.innerText = "Drop your file or click here to browse";
+        }
+
+        function handleDrop(event){
+            event.preventDefault();
+            fileInput.files = event.dataTransfer.files;
             const files = event.dataTransfer.files;
             updateFileDetails(files);
         }
 
         function updateFileDetails(files) {
             const fileName = files[0].name;
-            document.getElementById("cloud-img").style.display = "inline";
+            fileText.innerText = fileName;
             {% if variable == "x2h" %}
-                document.getElementById("cloud-img").src = "/static/images/xlsx.png";
+                cloudImg.src = "/static/images/xlsx.png";
             {% elif variable == "c2h" %}
-                document.getElementById("cloud-img").src = "/static/images/csv.png";
+                cloudImg.src = "/static/images/csv.png";
             {% elif variable == "h2x" %}
-                document.getElementById("cloud-img").src = "/static/images/html.png";
+                cloudImg.src = "/static/images/html.png";
             {% elif variable == "h2c" %}
-                document.getElementById("cloud-img").src = "/static/images/html.png";
+                cloudImg.src = "/static/images/html.png";
             {% endif %}
-            document.getElementById('drag-text').style.display = "none";
-            document.getElementById('file-text').style.display = "block";
-            document.getElementById('file-text').innerText = fileName;
         }
-
-        function handleDragLeave(event){
-            event.preventDefault();
-            document.getElementById("cloud-img").style.display = "inline";
-            document.getElementById("cloud-img").src = "/static/images/cloud.png";
-            document.getElementById('file-text').style.display = "block";
-            document.getElementById('drag-text').style.display = "none";
-        }
-
-        document.getElementById('file').addEventListener("change", function (event) {
-            updateFileDetails(event.target.files);
-        });
+    });
     </script>
 </body>
 </html>

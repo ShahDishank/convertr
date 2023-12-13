@@ -42,6 +42,7 @@
                         <div class="wrapper">
                             <img src="/static/images/cloud.png" alt="cloud-img" id="cloud-img">
                             <p id="file-text">Drop your file or click here to browse</p>
+                            <p id="limit-text">(Upload file below 2 MB)</p>
                             <input type="file" name="file" id="file"/>
                         </div>
                     </label>
@@ -67,6 +68,7 @@
             var fileLabel = document.getElementById('file-label');
             var cloudImg = document.getElementById('cloud-img');
             var fileText = document.getElementById('file-text');
+            var limitText = document.getElementById('limit-text');
 
             fileInput.addEventListener('change', handleFileSelect);
             fileLabel.addEventListener('dragover', handleDragOver);
@@ -86,32 +88,45 @@
             function handleDragOver(event) {
                 event.preventDefault();
                 fileText.innerText = "Drop Here";
+                limitText.innerText = "";
             }
 
             function handleDragLeave(event) {
                 event.preventDefault();
                 fileText.innerText = "Drop your file or click here to browse";
+                limitText.innerText = "(Upload file below 2 MB)";
             }
 
             function handleDrop(event){
                 event.preventDefault();
+                cloudImg.src = "/static/images/cloud.png";
+                fileText.innerText = "Drop your file or click here to browse";
+                limitText.innerText = "(Upload file below 2 MB)";
                 fileInput.files = event.dataTransfer.files;
                 var files = event.dataTransfer.files;
                 updateFileDetails(files);
             }
 
             function updateFileDetails(files) {
-                var fileName = files[0].name;
-                fileText.innerText = fileName;
-                {% if variable == "x2h" %}
-                    cloudImg.src = "/static/images/xlsx.png";
-                {% elif variable == "c2h" %}
-                    cloudImg.src = "/static/images/csv.png";
-                {% elif variable == "h2x" %}
-                    cloudImg.src = "/static/images/html.png";
-                {% elif variable == "h2c" %}
-                    cloudImg.src = "/static/images/html.png";
-                {% endif %}
+                var fileSize = files[0].size;
+                var sizeInMB = (fileSize / (1024 * 1024)).toFixed(2);
+                if(sizeInMB >= 2){
+                    alert("File size is " + sizeInMB + " MB. Keep it below 2 MB!");
+                }
+                else{
+                    var fileName = files[0].name;
+                    fileText.innerText = fileName;
+                    limitText.innerText = "";
+                    {% if variable == "x2h" %}
+                        cloudImg.src = "/static/images/xlsx.png";
+                    {% elif variable == "c2h" %}
+                        cloudImg.src = "/static/images/csv.png";
+                    {% elif variable == "h2x" %}
+                        cloudImg.src = "/static/images/html.png";
+                    {% elif variable == "h2c" %}
+                        cloudImg.src = "/static/images/html.png";
+                    {% endif %}
+                }
             }
         }
     </script>

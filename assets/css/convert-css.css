@@ -74,8 +74,14 @@ form {
 .wrapper {
     text-align: center;
 }
-#file-text, #error-text {
+#file-text{
     font-size: 2rem;
+    margin-top: 30px;
+    color: white;
+    text-shadow: 5px 5px 5px black;
+}
+#limit-text{
+    font-size: 1.3rem;
     margin-top: 30px;
     color: white;
     text-shadow: 5px 5px 5px black;

@@ -111,10 +111,13 @@ def h2c(hname, name):
 def success(var):
     if request.method == 'POST':
         f = request.files['file']
-        try:
-            f.save(upload_path+f.filename)
-        except:
-            return redirect(url_for('convert', var = var, err = "File cannot be fetched. Try again!"))
+        if f.filename == "":
+            return redirect(url_for('convert', var = var, err = "Please select file!"))
+        else:
+            try:
+                f.save(upload_path+f.filename)
+            except:
+                return redirect(url_for('convert', var = var, err = "File cannot be fetched. Try again!"))
 
         if var == 'x2h':
             if f.filename.endswith('xlsx'):

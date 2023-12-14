@@ -126,44 +126,21 @@ def h2c(hname, name):
 def success(var):
     if request.method == 'POST':
         f = request.files['file']
-        if f.filename == "":
-            return redirect(url_for('convert', var = var, err = "Please select file!"))
-        else:
-            try:
-                f.save(upload_path+f.filename)
-            except:
-                return redirect(url_for('convert', var = var, err = "File cannot be fetched. Try again!"))
+        try:
+            f.save(upload_path+f.filename)
+        except:
+            return redirect(url_for('convert', var = var, err = "File cannot be fetched. Try again!"))
 
         if var == 'x2h':
-            if f.filename.endswith('xlsx'):
-                name = f.filename.replace(".xlsx", "")
-                return x2h(upload_path+f.filename, name)
-            else:
-                if os.path.isfile(upload_path+f.filename):
-                    os.remove(upload_path+f.filename)
-                return redirect(url_for('convert', var = var, err = "Select XLSX file only!"))
+            name = f.filename.replace(".xlsx", "")
+            return x2h(upload_path+f.filename, name)
         elif var == 'c2h':
-            if f.filename.endswith('csv'):
-                name = f.filename.replace(".csv", "")
-                return c2h(upload_path+f.filename, name)
-            else:
-                if os.path.isfile(upload_path+f.filename):
-                    os.remove(upload_path+f.filename)
-                return redirect(url_for('convert', var = var, err = "Select CSV file only!"))
+            name = f.filename.replace(".csv", "")
+            return c2h(upload_path+f.filename, name)
         elif var == 'h2x':
-            if f.filename.endswith('html'):
-                name = f.filename.replace(".html", "")
-                return h2x(upload_path+f.filename, name)
-            else:
-                if os.path.isfile(upload_path+f.filename):
-                    os.remove(upload_path+f.filename)
-                return redirect(url_for('convert', var = var, err = "Select HTML file only!"))
+            name = f.filename.replace(".html", "")
+            return h2x(upload_path+f.filename, name)
         elif var == 'h2c':
-            if f.filename.endswith('html'):
-                name = f.filename.replace(".html", "")
-                return h2c(upload_path+f.filename, name)
-            else:
-                if os.path.isfile(upload_path+f.filename):
-                    os.remove(upload_path+f.filename)
-                return redirect(url_for('convert', var = var, err = "Select HTML file only!"))
+            name = f.filename.replace(".html", "")
+            return h2c(upload_path+f.filename, name)
         return redirect(url_for('home'))

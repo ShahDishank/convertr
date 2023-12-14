@@ -45,6 +45,9 @@ body {
 #error-text{
     margin-top: 100px;
 }
+#editor, #header{
+    visibility: hidden;
+}
 code{
     font-size: 0.9rem;
 }

@@ -20,7 +20,7 @@
     {% if err != "0" %}
         <h1 class="title-error-text" id="error-text">{{html}}</h1>
     {% else %}
-        <h1 class="title-error-text">Generated HTML Code</h1>
+        <h1 class="title-error-text" id="title-text">Generating HTML Code...</h1>
         <div id="header">
         <div>{{name}}.html</div>
             <div id="copy-container">
@@ -29,7 +29,7 @@
                 <abbr title="Download File"><img src="/static/images/download.png" alt="download-button" id="download-button" class="button" onclick="download()"></abbr>
             </div>
         </div>
-        <pre><code class="language-html" id="htmlcode">
+        <pre id="editor"><code class="language-html" id="htmlcode">
 {{html}}
 </code></pre>
         <br>
@@ -44,6 +44,11 @@
 
     <script>
         hljs.highlightAll();
+        window.onload = function(){
+            document.getElementById('header').style.visibility = 'visible';
+            document.getElementById('editor').style.visibility = 'visible';
+            document.getElementById('title-text').innerText = "Generated HTML Code";
+        }
         function copyCode() {
                     var text = document.getElementById('htmlcode');
                     navigator.clipboard.writeText(text.innerText);

@@ -42,14 +42,16 @@
                         <div class="wrapper">
                             <img src="/static/images/cloud.png" alt="cloud-img" id="cloud-img">
                             <p id="file-text">Drop your file or click here to browse</p>
-                            <p id="limit-text">(Upload file below 2 MB)</p>
+                            <p id="limit-text">(Upload file below 800 KB)</p>
                             <input type="file" name="file" id="file"/>
                         </div>
                     </label>
                     {% if variable == "x2h" or variable == "c2h" %}
-                        <input type="submit" value="Convert" class="submitBtn">
+                        <input type="submit" value="Convert" id="cBtn" class="submitBtn">
+                        <button type="button" class="btn btn-outline-light fsubmitBtn" id="cfBtn" onclick="submitFile()">Convert</button>
                     {% elif variable == "h2x" or variable == "h2c" %}
-                        <input type="submit" value="Convert and Download" class="submitBtn" id="cdBtn">
+                        <input type="submit" value="Convert and Download" id="cdBtn" class="submitBtn">
+                        <button type="button" class="btn btn-outline-light fsubmitBtn" id="cdfBtn" onclick="submitFile()">Convert and Download</button>
                     {% endif %}
                 </form>
             </div>
@@ -58,6 +60,7 @@
     <footer>Developed by &copy; <a href="mailto:shahdishank24@gmail.com" target="_blank">Dishank Shah</a></footer>
 
     <script>
+
         window.onload = function(){
             {% if err != "0" %}
                 alert("{{err}}");
@@ -69,15 +72,13 @@
             var cloudImg = document.getElementById('cloud-img');
             var fileText = document.getElementById('file-text');
             var limitText = document.getElementById('limit-text');
+            var cBtn = document.getElementById('cBtn');
+            var cdBtn = document.getElementById('cdBtn');
 
             fileInput.addEventListener('change', handleFileSelect);
             fileLabel.addEventListener('dragover', handleDragOver);
             fileLabel.addEventListener('dragleave', handleDragLeave);
             fileLabel.addEventListener('drop', handleDrop);
-
-            if(fileInput.files.length != 0){
-                updateFileDetails(fileInput.files);
-            }
 
             function handleFileSelect(event) {
                 fileInput.files = event.target.files;
@@ -94,14 +95,14 @@
             function handleDragLeave(event) {
                 event.preventDefault();
                 fileText.innerText = "Drop your file or click here to browse";
-                limitText.innerText = "(Upload file below 2 MB)";
+                limitText.innerText = "(Upload file below 800 KB)";
             }
 
             function handleDrop(event){
                 event.preventDefault();
                 cloudImg.src = "/static/images/cloud.png";
                 fileText.innerText = "Drop your file or click here to browse";
-                limitText.innerText = "(Upload file below 2 MB)";
+                limitText.innerText = "(Upload file below 800 KB)";
                 fileInput.files = event.dataTransfer.files;
                 var files = event.dataTransfer.files;
                 updateFileDetails(files);
@@ -109,9 +110,10 @@
 
             function updateFileDetails(files) {
                 var fileSize = files[0].size;
-                var sizeInMB = (fileSize / (1024 * 1024)).toFixed(2);
-                if(sizeInMB >= 2){
-                    alert("File size is " + sizeInMB + " MB. Keep it below 2 MB!");
+                var sizeInKB = (fileSize / 1024).toFixed(2);
+                if(sizeInKB > 800){
+                    fileInput.value = "";
+                    alert("File size is " + sizeInKB + " KB. Keep it below 800 KB!");
                 }
                 else{
                     var fileName = files[0].name;
@@ -129,6 +131,59 @@
                 }
             }
         }
+        function resetStyle(){
+            let cloudImg = document.getElementById('cloud-img');
+            let fileText = document.getElementById('file-text');
+            let limitText = document.getElementById('limit-text');
+            let fileInput = document.getElementById('file');
+
+            cloudImg.src = "/static/images/cloud.png";
+            fileText.innerText = "Drop your file or click here to browse";
+            limitText.innerText = "(Upload file below 800 KB)";
+            fileInput.value = "";
+        }
+        function submitFile(){
+                let fileInput = document.getElementById('file');
+                if(fileInput.files.length == 0){
+                    alert("Please select file!");
+                }
+                else{
+                    fname = fileInput.files[0].name;
+                    {% if variable == "x2h" %}
+                        if(!fname.endsWith(".xlsx")){
+                            resetStyle();
+                            alert("Select Only XLSX file!");
+                        }
+                        else{
+                            cBtn.click();
+                        }
+                    {% elif variable == "c2h" %}
+                        if(!fname.endsWith(".csv")){
+                            resetStyle();
+                            alert("Select Only CSV file!");
+                        }
+                        else{
+                            cBtn.click();
+                        }
+                    {% elif variable == "h2x" %}
+                        if(!fname.endsWith(".html")){
+                            resetStyle();
+                            alert("Select Only HTML file!");
+                        }
+                        else{
+                            cdBtn.click();
+                        }
+                    {% elif variable == "h2c" %}
+                        if(!fname.endsWith(".html")){
+                            resetStyle();
+                            alert("Select Only HTML file!");
+                        }
+                        else{
+                            cdBtn.click();
+                        }
+                    {% endif %}
+                }
+            }
     </script>
 </body>
 </html>

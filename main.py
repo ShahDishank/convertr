@@ -1,8 +1,8 @@
 from flask import Flask, render_template, request, redirect, url_for, send_file
 import pandas as pd
-from xlsx2html import xlsx2html
-from html2excel import ExcelParser
 import bs4
+import csv
+from openpyxl import Workbook
 import os
 
 app = Flask(__name__)
@@ -37,23 +37,14 @@ def download():
 
 def x2h(ename, name):
     try:
-        out_stream = xlsx2html(ename)
-        out_stream.seek(0)
-        html = out_stream.read()
-        soup = bs4.BeautifulSoup(html, 'html.parser')
-        formatter = bs4.formatter.HTMLFormatter(indent=4)
-        html = soup.prettify(formatter=formatter)
+        df = pd.read_excel(ename)
+        if df.empty:
+            return render_template('download.html', html = "The file is empty, No HTML generated!", err = "1", name="0")
+        html = df.to_html(index=False)
+        html = html.replace("NaN","")
         return render_template('download.html', html = html, err = "0", name = name)
     except:
-        try:
-            df = pd.read_excel(ename)
-            html = df.to_html(index=False)
-            soup = bs4.BeautifulSoup(html, 'html.parser')
-            formatter = bs4.formatter.HTMLFormatter(indent=4)
-            html = soup.prettify(formatter=formatter)
-            return render_template('download.html', html = html, err = "0", name = name)
-        except:
-            return render_template('download.html', html = "Due to some error, HTML cannot be generated!", err = "1", name = "0")
+        return render_template('download.html', html = "Due to some error, HTML cannot be generated!", err = "1", name = "0")
     finally:
         if(os.path.isfile(ename)):
             os.remove(ename)
@@ -62,13 +53,10 @@ def x2h(ename, name):
 def c2h(fname, name):
     try:
         df = pd.read_csv(fname)
-        html = df.to_html(index=False, header=False)
-        soup = bs4.BeautifulSoup(html, 'html.parser')
-        formatter = bs4.formatter.HTMLFormatter(indent=4)
-        html = soup.prettify(formatter=formatter)
+        html = df.to_html(index=False)
         return render_template('download.html', html = html, err = "0", name = name)
     except:
-        return render_template('download.html', html = "Due to some error, HTML cannot be generated!", err = "1", name="0")
+        return render_template('download.html', html = "CSV is blank or unable to convert!", err = "1", name="0")
     finally:
         if os.path.isfile(fname):
             os.remove(fname)
@@ -76,16 +64,25 @@ def c2h(fname, name):
 
 def h2x(hname, name):
     try:
-        parser = ExcelParser(hname)
-        parser.to_excel(upload_path+name+'.xlsx')
+        with open(hname, 'r', encoding='utf-8') as html_file:
+            html_content = html_file.read()
+        soup = bs4.BeautifulSoup(html_content, 'html.parser')
+        tables = soup.find_all('table')
+        if not tables:
+            return render_template('download.html', html = "There are no tables or unable to detect!", err = "1", name="0")
+        else:
+            workbook = Workbook()
+            for table_index, table in enumerate(tables, start=1):
+                worksheet = workbook.create_sheet(title=f'Table_{table_index}')
+                for row_index, row in enumerate(table.find_all('tr'), start=1):
+                    for col_index, cell in enumerate(row.find_all(['td', 'th']), start=1):
+                        worksheet.cell(row=row_index, column=col_index, value=cell.get_text(strip=True))
+
+            workbook.remove(workbook.active)
+            workbook.save(upload_path+name+'.xlsx')
         return send_file(name+'.xlsx', as_attachment=True)
     except:
-        try:
-            table = pd.read_html(hname)
-            table.to_excel(upload_path+name+'.xlsx')
-            return send_file(name+'.xlsx', as_attachment=True)
-        except:
-            return render_template('download.html', html = "Due to some error, File cannot be converted!", err = "1", name="0")
+        return render_template('download.html', html = "Due to some error, File cannot be converted!", err = "1", name="0")
     finally:
         if os.path.isfile(hname):
             os.remove(hname)
@@ -95,8 +92,26 @@ def h2x(hname, name):
 
 def h2c(hname, name):
     try:
-        df = pd.read_html(hname)[0]
-        df.to_csv(upload_path+name+".csv", index=False, header=False)
+        with open(hname, 'r', encoding='utf-8') as html_file:
+            html_content = html_file.read()
+        soup = bs4.BeautifulSoup(html_content, 'html.parser')
+        tables = soup.find_all('table')
+        if not tables:
+            return render_template('download.html', html = "There are no tables or unable to detect!", err = "1", name="0")
+        else:
+            csv_filename = upload_path+name+'.csv'
+            with open(csv_filename, 'a', newline='', encoding='utf-8') as csv_file:
+                csv_writer = csv.writer(csv_file)
+
+                for table_index, table in enumerate(tables, start=1):
+                    if table_index > 1:
+                        csv_writer.writerow([])
+                        csv_writer.writerow([f"Table-{table_index}"])
+                        csv_writer.writerow([])
+
+                    for row in table.find_all('tr'):
+                        csv_writer.writerow(cell.get_text(strip=True) for cell in row.find_all(['td', 'th']))
+
         return send_file(name+'.csv', as_attachment=True)
     except:
         return render_template('download.html', html = "Due to some error, File cannot be converted!", err = "1", name = "0")
@@ -152,7 +167,3 @@ def success(var):
                     os.remove(upload_path+f.filename)
                 return redirect(url_for('convert', var = var, err = "Select HTML file only!"))
         return redirect(url_for('home'))
-
-
-# if __name__ == "__main__":
-#     app.run(debug=True)

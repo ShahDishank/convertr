@@ -8,9 +8,6 @@ charset-normalizer==3.3.2
 click==8.1.7
 et-xmlfile==1.1.0
 Flask==3.0.0
-html2excel==0.0.6
-html5lib==1.1
-html5print==0.1.2
 idna==3.6
 itsdangerous==2.1.2
 Jinja2==3.1.2

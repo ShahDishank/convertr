@@ -144,7 +144,8 @@
         }
         function submitFile(){
                 let fileInput = document.getElementById('file');
-                if(fileInput.files.length == 0){
+                let limitText = document.getElementById('limit-text');
+                if(fileInput.files.length == 0 || limitText.innerText != ""){
                     alert("Please select file!");
                 }
                 else{

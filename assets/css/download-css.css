@@ -48,8 +48,18 @@ body {
 #editor, #header{
     visibility: hidden;
 }
-code{
-    font-size: 0.9rem;
+#wrap-full{
+    width: 65vw;
+}
+#header, #htmlcode{
+    font-size: 1rem;
+}
+#htmlcode{
+    padding-top: 30px;
+}
+#editor-container{
+    display: flex;
+    justify-content: center;
 }
 #header {
     background-color: rgb(2, 2, 50);

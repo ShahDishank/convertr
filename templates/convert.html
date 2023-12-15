@@ -22,6 +22,9 @@
     <link rel="icon" type="image/x-icon" href="/static/images/favicon.png">
 </head>
 <body>
+    <div id="loader-wrapper">
+        <img src="/static/images/icon.png" alt="loader-img" id="loader"></img>
+    </div>
     <a href="{{url_for('home')}}"><img src="/static/images/icon.png" alt="logo" id="logo"></a>
     <div class="container">
         <h2 class="text-center mb-5" id="heading">
@@ -37,7 +40,7 @@
         </h2>
         <div class="row">
             <div class="col-xs-12">
-                <form action = "/success/{{variable}}" method = "post" enctype="multipart/form-data" class="text-center">
+                <form action = "/success/{{variable}}" method = "post" enctype="multipart/form-data" id="form" class="text-center">
                     <label for="file" id="file-label">
                         <div class="wrapper">
                             <img src="/static/images/cloud.png" alt="cloud-img" id="cloud-img">
@@ -47,10 +50,9 @@
                         </div>
                     </label>
                     {% if variable == "x2h" or variable == "c2h" %}
-                        <input type="submit" value="Convert" id="cBtn" class="submitBtn">
+                        <!--<input type="submit" value="Convert" id="cBtn" class="submitBtn">-->
                         <button type="button" class="btn btn-outline-light fsubmitBtn" id="cfBtn" onclick="submitFile()">Convert</button>
                     {% elif variable == "h2x" or variable == "h2c" %}
-                        <input type="submit" value="Convert and Download" id="cdBtn" class="submitBtn">
                         <button type="button" class="btn btn-outline-light fsubmitBtn" id="cdfBtn" onclick="submitFile()">Convert and Download</button>
                     {% endif %}
                 </form>
@@ -62,6 +64,8 @@
     <script>
 
         window.onload = function(){
+            resetStyle();
+
             {% if err != "0" %}
                 alert("{{err}}");
             {% endif %}
@@ -145,44 +149,55 @@
         function submitFile(){
                 let fileInput = document.getElementById('file');
                 let limitText = document.getElementById('limit-text');
-                if(fileInput.files.length == 0 || limitText.innerText != ""){
-                    alert("Please select file!");
+                let loader = document.getElementById("loader-wrapper");
+                let form = document.getElementById("form");
+                if(fileInput.files.length == 0 && limitText.innerText == ""){
+                    resetStyle();
+                    alert("Select file again!");
                 }
                 else{
-                    fname = fileInput.files[0].name;
-                    {% if variable == "x2h" %}
-                        if(!fname.endsWith(".xlsx")){
-                            resetStyle();
-                            alert("Select Only XLSX file!");
-                        }
-                        else{
-                            cBtn.click();
-                        }
-                    {% elif variable == "c2h" %}
-                        if(!fname.endsWith(".csv")){
-                            resetStyle();
-                            alert("Select Only CSV file!");
-                        }
-                        else{
-                            cBtn.click();
-                        }
-                    {% elif variable == "h2x" %}
-                        if(!fname.endsWith(".html")){
-                            resetStyle();
-                            alert("Select Only HTML file!");
-                        }
-                        else{
-                            cdBtn.click();
-                        }
-                    {% elif variable == "h2c" %}
-                        if(!fname.endsWith(".html")){
-                            resetStyle();
-                            alert("Select Only HTML file!");
-                        }
-                        else{
-                            cdBtn.click();
-                        }
-                    {% endif %}
+                    if(limitText.innerText != ""){
+                        resetStyle();
+                        alert("Please select file!");
+                    }
+                    else{
+                        fname = fileInput.files[0].name;
+                        {% if variable == "x2h" %}
+                            if(!fname.endsWith(".xlsx")){
+                                resetStyle();
+                                alert("Select Only XLSX file!");
+                            }
+                            else{
+                                loader.style.display = "flex";
+                                form.submit();
+                            }
+                        {% elif variable == "c2h" %}
+                            if(!fname.endsWith(".csv")){
+                                resetStyle();
+                                alert("Select Only CSV file!");
+                            }
+                            else{
+                                loader.style.display = "flex";
+                                form.submit();
+                            }
+                        {% elif variable == "h2x" %}
+                            if(!fname.endsWith(".html")){
+                                resetStyle();
+                                alert("Select Only HTML file!");
+                            }
+                            else{
+                                form.submit();
+                            }
+                        {% elif variable == "h2c" %}
+                            if(!fname.endsWith(".html")){
+                                resetStyle();
+                                alert("Select Only HTML file!");
+                            }
+                            else{
+                                form.submit();
+                            }
+                        {% endif %}
+                    }
                 }
             }
     </script>

@@ -6,6 +6,7 @@ from openpyxl import Workbook
 import os
 
 app = Flask(__name__)
+app.config['MAX_CONTENT_LENGTH'] = 800 * 1024
 upload_path = 'convertr/'
 
 @app.route("/")
@@ -37,10 +38,18 @@ def download():
 
 def x2h(ename, name):
     try:
-        df = pd.read_excel(ename)
-        if df.empty:
-            return render_template('download.html', html = "The file is empty, No HTML generated!", err = "1", name="0")
-        html = df.to_html(index=False)
+        excel_data = pd.read_excel(ename, sheet_name=None)
+
+        html = ""
+
+        for sheet_name, sheet_data in excel_data.items():
+            if sheet_data.empty:
+                html += f"<h2>{sheet_name}</h2>\n"
+                html += "<h4>This sheet is empty!<h4>"
+            else:
+                html += f"<h2>{sheet_name}</h2>\n"
+                html += sheet_data.to_html(index=False) + "\n\n"
+
         html = html.replace("NaN","")
         return render_template('download.html', html = html, err = "0", name = name)
     except:
@@ -54,6 +63,7 @@ def c2h(fname, name):
     try:
         df = pd.read_csv(fname)
         html = df.to_html(index=False)
+        html = html.replace("NaN","")
         return render_template('download.html', html = html, err = "0", name = name)
     except:
         return render_template('download.html', html = "CSV is blank or unable to convert!", err = "1", name="0")
@@ -69,7 +79,7 @@ def h2x(hname, name):
         soup = bs4.BeautifulSoup(html_content, 'html.parser')
         tables = soup.find_all('table')
         if not tables:
-            return render_template('download.html', html = "There are no tables or unable to detect!", err = "1", name="0")
+            return render_template('download.html', html = "No tables found or unable to detect!", err = "1", name="0")
         else:
             workbook = Workbook()
             for table_index, table in enumerate(tables, start=1):
@@ -97,7 +107,7 @@ def h2c(hname, name):
         soup = bs4.BeautifulSoup(html_content, 'html.parser')
         tables = soup.find_all('table')
         if not tables:
-            return render_template('download.html', html = "There are no tables or unable to detect!", err = "1", name="0")
+            return render_template('download.html', html = "No tables found or unable to detect!", err = "1", name="0")
         else:
             csv_filename = upload_path+name+'.csv'
             with open(csv_filename, 'a', newline='', encoding='utf-8') as csv_file:
